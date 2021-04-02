@@ -9,6 +9,12 @@ namespace GradeBook
         {
             var book = new Book("Kairi's Gradebook");
 
+            // Subscribing to an event.
+            book.GradeAdded += OnGradeAdded;
+            book.GradeAdded += OnGradeAdded;
+            book.GradeAdded -= OnGradeAdded;
+            book.GradeAdded += OnGradeAdded;
+
             while (true)
             {
                 Console.WriteLine("Input a grade. (q to quit)");
@@ -52,6 +58,11 @@ namespace GradeBook
             Console.WriteLine($"The lowest grade is => {stats.Low}\nThe highest grade is {stats.High}");
             Console.WriteLine($"The letter grade is {stats.Letter}");
 
+        }
+
+        static void OnGradeAdded(object sender, EventArgs e)
+        {
+            Console.WriteLine("A grade was added from the event.");
         }
     }
 }

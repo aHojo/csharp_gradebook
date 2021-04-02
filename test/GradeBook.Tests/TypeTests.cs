@@ -5,8 +5,45 @@ using Xunit;
 
 namespace GradeBook.Tests
 {
+    public delegate String WriteLogDelegate(string logMessage);
+
     public class TypeTests
     {
+
+        private int count = 0;
+
+        [Fact]
+        public void WriteLogDelegateToMethod()
+        {
+            /* SINGLE DELEGATE
+            WriteLogDelegate log;
+
+            log = new WriteLogDelegate(ReturnMessage); // passing in the method here. 
+            // or can do log = ReturnMessage
+            */
+
+            /* MULTI-cast DELEGATE */
+            WriteLogDelegate log = ReturnMessage;
+            // Here is how we do multi-cast delegate. 
+            log += ReturnMessage;
+            log += IncrementCount;
+
+            var result = log("Hello");
+
+            Assert.Equal(3, count);
+        }
+
+        // ReturnMessage matches the delegate signature.
+        private string ReturnMessage(string message)
+        {
+            count++;
+            return message;
+        }
+        private string IncrementCount(string message)
+        {
+            count++;
+            return message.ToLower();
+        }
 
         [Fact]
         public void StringsBehaveLikeValueTypes()

@@ -30,7 +30,8 @@ namespace GradeBook.Tests
         {
             Book book = new Book("");
 
-            book.AddGrade(103.4);
+
+            Assert.Throws<ArgumentException>(() => book.AddGrade(103.4));
 
             var result = book.GetGrades();
             Assert.Empty(result);

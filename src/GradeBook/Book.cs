@@ -3,8 +3,12 @@ using System.Collections.Generic;
 
 namespace GradeBook
 {
+
+    // defining an event, first need a delagate. 
+    public delegate void GradeAddedDelegate(object sender, EventArgs args);
     public class Book
     {
+        public event GradeAddedDelegate GradeAdded;
         private List<double> grades;
 
         /* Properties Below */
@@ -29,7 +33,8 @@ namespace GradeBook
         public String Name
         {
             get;
-            private set;
+            //private set;
+            set;
         }
 
         // readonly String category; // can only change in the field or constructor. 
@@ -39,6 +44,10 @@ namespace GradeBook
             if (grade >= 0 && grade <= 100)
             {
                 this.grades.Add(grade);
+                if (GradeAdded != null)
+                {
+                    GradeAdded(this, new EventArgs()); // this object/class is the sender
+                }
             }
             else
             {
@@ -118,6 +127,7 @@ namespace GradeBook
             return this.grades;
         }
 
+        // EVENT
 
     }
 }
