@@ -7,13 +7,27 @@ namespace GradeBook
     {
         static void Main(string[] args)
         {
-            var book = new Book("Kairi's Gradebook");
+            var book = new DiskBook("Kairi's Gradebook");
 
             // Subscribing to an event.
             book.GradeAdded += OnGradeAdded;
-            book.GradeAdded += OnGradeAdded;
-            book.GradeAdded -= OnGradeAdded;
-            book.GradeAdded += OnGradeAdded;
+            EnterGrades(book);
+
+            // book.AddGrade(89.1);
+            // book.AddGrade(90.1);
+            // book.AddGrade(99.5);
+
+            Statistics stats = book.GetStatistics();
+
+            Console.WriteLine($"For the book named {book.Name}");
+            Console.WriteLine($"The average grade is {stats.Average:N1}"); // 1 decimal places printed 
+            Console.WriteLine($"The lowest grade is => {stats.Low}\nThe highest grade is {stats.High}");
+            Console.WriteLine($"The letter grade is {stats.Letter}");
+
+        }
+
+        private static void EnterGrades(IBook book) // IBook is an interface type.
+        {
 
             while (true)
             {
@@ -45,19 +59,6 @@ namespace GradeBook
                 }
 
             }
-
-            // book.AddGrade(89.1);
-            // book.AddGrade(90.1);
-            // book.AddGrade(99.5);
-
-            Statistics stats = book.GetStatistics();
-
-            Console.WriteLine(Book.CATEGORY);
-            Console.WriteLine($"For the book named {book.Name}");
-            Console.WriteLine($"The average grade is {stats.Average:N1}"); // 1 decimal places printed 
-            Console.WriteLine($"The lowest grade is => {stats.Low}\nThe highest grade is {stats.High}");
-            Console.WriteLine($"The letter grade is {stats.Letter}");
-
         }
 
         static void OnGradeAdded(object sender, EventArgs e)

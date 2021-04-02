@@ -11,7 +11,7 @@ namespace GradeBook.Tests
         public void BookCalculatesAverageGrade()
         {
             // Arrange section
-            var book = new Book("");
+            var book = new InMemoryBook("");
             book.AddGrade(89.1);
             book.AddGrade(90.5);
             book.AddGrade(77.3);
@@ -28,7 +28,7 @@ namespace GradeBook.Tests
         [Fact]
         public void NoGradesOver100()
         {
-            Book book = new Book("");
+            InMemoryBook book = new InMemoryBook("");
 
 
             Assert.Throws<ArgumentException>(() => book.AddGrade(103.4));

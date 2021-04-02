@@ -1,14 +1,48 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace GradeBook
 {
 
     // defining an event, first need a delagate. 
     public delegate void GradeAddedDelegate(object sender, EventArgs args);
-    public class Book
+
+
+    public class NamedObject
     {
-        public event GradeAddedDelegate GradeAdded;
+        public NamedObject(string name)
+        {
+            Name = name;
+        }
+
+        public String Name { get; set; }
+
+    }
+
+    public interface IBook
+    {
+        void AddGrade(double grade);
+        Statistics GetStatistics();
+        string Name { get; }
+        event GradeAddedDelegate GradeAdded;
+    }
+    public abstract class Book : NamedObject, IBook
+    {
+        protected Book(string name) : base(name)
+        {
+        }
+
+        public abstract event GradeAddedDelegate GradeAdded;
+
+        public abstract void AddGrade(double grade);
+
+        public abstract Statistics GetStatistics();
+
+    }
+    public class InMemoryBook : Book
+    {
+        public override event GradeAddedDelegate GradeAdded;
         private List<double> grades;
 
         /* Properties Below */
@@ -29,17 +63,19 @@ namespace GradeBook
             }
         }
         */
+
+
         /* New Way - Auto Property. */
-        public String Name
-        {
-            get;
-            //private set;
-            set;
-        }
+        // public String Name
+        // {
+        //     get;
+        //     //private set;
+        //     set;
+        // }
 
         // readonly String category; // can only change in the field or constructor. 
         public const String CATEGORY = "Science"; // with public here, others can now read it. 
-        public void AddGrade(double grade)
+        public override void AddGrade(double grade)
         {
             if (grade >= 0 && grade <= 100)
             {
@@ -77,48 +113,24 @@ namespace GradeBook
                     break;
             }
         }
-        public Statistics GetStatistics()
+        public override Statistics GetStatistics()
         {
             var result = new Statistics();
-            result.Average = 0.0D;
-            result.Low = double.MaxValue;
-            result.High = double.MinValue;
+
 
             foreach (var grade in this.grades)
             {
-                result.High = Math.Max(grade, result.High);
-                result.Low = Math.Min(grade, result.Low);
-                result.Average += grade;
+                result.Add(grade);
             }
 
-            result.Average /= this.grades.Count;
-
-            switch (result.Average)
-            {
-                case var d when d >= 90.0: // d gets assigned the value of result.Average. 
-                    result.Letter = 'A';
-                    break;
-                case var d when d >= 80.0:
-                    result.Letter = 'B';
-                    break;
-                case var d when d >= 70.0:
-                    result.Letter = 'C';
-                    break;
-                case var d when d >= 60.0:
-                    result.Letter = 'D';
-                    break;
-                default:
-                    result.Letter = 'F';
-                    break;
-            }
 
             return result;
         }
 
-        public Book(string name)
+        public InMemoryBook(string name) : base(name)
         {
             this.grades = new List<double>();
-            this.Name = name;
+
 
         }
 
@@ -129,5 +141,51 @@ namespace GradeBook
 
         // EVENT
 
+    }
+
+    public class DiskBook : Book
+    {
+        public DiskBook(string name) : base(name)
+        {
+        }
+
+        public override event GradeAddedDelegate GradeAdded;
+
+        public override void AddGrade(double grade)
+        {
+            // var file = File.AppendText($"./{Name}.txt");
+            // file.WriteLine(grade);
+            // file.Dispose();
+
+            // This is like the with statement in python.
+            using (var file = File.AppendText($"./{Name}.txt"))
+            {
+                file.WriteLine(grade);
+                if (GradeAdded != null)
+                {
+                    GradeAdded(this, new EventArgs());
+                }
+            }
+
+        }
+
+        public override Statistics GetStatistics()
+        {
+            var result = new Statistics();
+
+            using (var reader = File.OpenText($"./{Name}.txt"))
+            {
+
+                var line = reader.ReadLine();
+                while (line != null)
+                {
+                    var num = double.Parse(line.Trim());
+                    result.Add(num);
+                    line = reader.ReadLine();
+                }
+            }
+
+            return result;
+        }
     }
 }
